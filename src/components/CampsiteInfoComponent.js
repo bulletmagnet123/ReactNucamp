@@ -18,7 +18,7 @@ const maxLength = len => val => !val || (val.length <= len);
 const minLength = len => val => val && (val.length >= len);
 
 
-function RenderCampsite({ campsite }) {
+function RenderCampsite({ campsite, addComment, campsiteId }) {
   return (
     <div class="col-md-5 m-1">
       <Card>
@@ -48,6 +48,8 @@ class CommentForm extends Component {
     });
   }
   handleSubmit(values) {
+    this.toggleModal();
+    this.props.addComment(this.props.campsiteId, values.rating, values.author, values.text)
     console.log('Current state is: ' + JSON.stringify(values));
     alert('Current state is: ' + JSON.stringify(values));
   }
@@ -69,8 +71,8 @@ class CommentForm extends Component {
                 <option value="5">5</option>
               </Control.select>
               <Col>
-              <Label htmlFor="author" md={2}>
-                Your Name
+                <Label htmlFor="author" md={2}>
+                  Your Name
                 </Label>
                 <Control.text model=".author" id=".author" name="author"
                   placeholder="Your Name"
@@ -82,27 +84,27 @@ class CommentForm extends Component {
                   }}
                 />
                 <Errors
-                    className="text-danger"
-                    model=".author"
-                    show="touched"
-                    Component="div"
-                    messages={{
-                      required: 'Required',
-                      minLength: 'Must be at least 2 characters',
-                      maxLength: 'Must be 15 characters or less'
-                    }}
-                  />
-                </Col>
-                <Label htmlFor="author" md={2}>
-                Text
-                </Label>
-                <Control.textarea model=".text" id="text" name="text"
-                  placeholder="Text" row={6}
-                  className="form-control"
+                  className="text-danger"
+                  model=".author"
+                  show="touched"
+                  Component="div"
+                  messages={{
+                    required: 'Required',
+                    minLength: 'Must be at least 2 characters',
+                    maxLength: 'Must be 15 characters or less'
+                  }}
                 />
-                <Button type="submit" color="primary">
-                    Send Feedback
-                  </Button>
+              </Col>
+              <Label htmlFor="author" md={2}>
+                Text
+              </Label>
+              <Control.textarea model=".text" id="text" name="text"
+                placeholder="Text" row={6}
+                className="form-control"
+              />
+              <Button type="submit" color="primary">
+                Send Feedback
+              </Button>
             </LocalForm >
           </ModalBody>
         </Modal>
@@ -111,7 +113,7 @@ class CommentForm extends Component {
   }
 }
 
-function RenderComments({ comments }) {
+function RenderComments({ comments, addComment, campsiteId }) {
   console.log(comments);
   if (comments) {
     return (
@@ -133,8 +135,7 @@ function RenderComments({ comments }) {
             </div>
           );
         })}
-        <CommentForm />
-
+        <CommentForm campsiteId={campsiteId} addComment={addComment} />
       </div>
     );
   }
@@ -158,7 +159,11 @@ function CampsiteInfo(props) {
         </div>
         <div className="row">
           <RenderCampsite campsite={props.campsite} />
-          <RenderComments comments={props.comments} />
+          <RenderComments
+            comments={props.comments}
+            addComment={props.addComment}
+            campsiteId={props.campsite.id}
+          />
         </div>
       </div>
     );
